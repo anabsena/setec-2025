@@ -656,11 +656,6 @@ function removerPontos(input) {
   input.value = input.value.replace(/\./g, '');
 }
 
-/* ==========================
-   FIREBASE (front-end) — COMPAT (MANTIDO)
-   ========================== */
-
-// Carrega SDK compat se necessário (funciona em script não-module)
 function loadScript(src) {
   return new Promise((resolve, reject) => {
     if (document.querySelector(`script[src="${src}"]`)) return resolve()
@@ -673,10 +668,8 @@ function loadScript(src) {
 }
 
 async function ensureFirebase() {
-  // Se já inicializado:
   if (window.firebase?.apps?.length) return window.firebase
 
-  // Carrega SDKs compat
   await loadScript('https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js')
   await loadScript('https://www.gstatic.com/firebasejs/10.13.2/firebase-analytics-compat.js')
   await loadScript('https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js')
@@ -714,7 +707,6 @@ function formToObject(form) {
   if (obj.data_aluno) obj.data_aluno = toISODateOrNull(obj.data_aluno)
   if (obj.data_visitante) obj.data_visitante = toISODateOrNull(obj.data_visitante)
 
-  // Deduza tipo_registro se não existir
   if (!obj.tipo_registro) {
     if (obj.nome_aluno || obj.email_aluno) obj.tipo_registro = 'aluno'
     else if (obj.nome_visitante || obj.email_visitante) obj.tipo_registro = 'visitante'
@@ -722,7 +714,6 @@ function formToObject(form) {
   return obj
 }
 
-// === Salvar no Firebase Firestore (substitui Workbench/MySQL) — COMPAT (MANTIDO) ===
 async function mirrorToFirebaseFromFormCompat(form) {
   try {
     const firebase = await ensureFirebase()
@@ -738,12 +729,9 @@ async function mirrorToFirebaseFromFormCompat(form) {
 }
 
 
-/* ==========================================================
-   OPÇÃO B (ES MODULES) — SOBRESCREVE a função acima SEM REMOVER NADA
-   ========================================================== */
+
 async function mirrorToFirebaseFromForm(form) {
   try {
-    // Usa o Firestore do SDK de módulos já inicializado no topo (__db)
     const payload = formToObject(form)
 
     if (payload.data_aluno) payload.data_aluno = toISODateOrNull(payload.data_aluno)
